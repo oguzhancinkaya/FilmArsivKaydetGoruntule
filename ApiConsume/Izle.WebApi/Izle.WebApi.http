@@ -1,0 +1,6 @@
+@Izle.WebApi_HostAddress = http://localhost:5078
+
+GET {{Izle.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

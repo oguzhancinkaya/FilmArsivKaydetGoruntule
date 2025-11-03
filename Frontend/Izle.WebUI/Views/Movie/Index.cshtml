@@ -1,0 +1,146 @@
+﻿@model List<Movie>
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Views/HFLayout/_HFLayout.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<div class="section__wrap">
+				<h2 class="section__title">FİLMLER</h2>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="catalog">
+	<div class="container">
+		<div class="row">
+			@foreach (var item in Model)
+			{
+				<div class="col-6 col-sm-4 col-lg-3 col-xl-2">
+					<div class="card">
+						<div class="card__cover">
+							<img src="@item.CoverImageUrl" alt="">
+							<a href="@Url.Action("MovieDetail", "Movie", new { id = item.MovieId })" class="card__play">
+								<i class="icon ion-ios-eye"></i>
+							</a>
+						</div>
+
+						<div class="card__content">
+							<h3 class="card__title"><a href="#">@item.Title</a></h3>
+							<span class="card__category">
+								<a href="#">@item.Category</a>
+							</span>
+							<span class="card__rate"><i class="icon ion-ios-star"></i>@item.Rating</span>
+						</div>
+
+						<div class="card__buttons">
+							@if (User.Identity.IsAuthenticated)
+							{
+								<button class="btn-status watched">İzledim</button>
+								<button class="btn-status watching">İzliyorum</button>
+								<button class="btn-status willwatch">İzleyeceğim</button>
+							}
+							else
+							{
+								<button class="btn-status disabled" disabled>İzledim</button>
+								<button class="btn-status disabled" disabled>İzliyorum</button>
+								<button class="btn-status disabled" disabled>İzleyeceğim</button>
+							}
+						</div>
+					</div>
+				</div>
+			}
+
+			<div class="col-12">
+				<ul class="paginator">
+					<li class="paginator__item paginator__item--prev">
+						<a href="#"><i class="icon ion-ios-arrow-back"></i></a>
+					</li>
+					<li class="paginator__item paginator__item--active"><a href="#">1</a></li>
+					<li class="paginator__item"><a href="#">2</a></li>
+					<li class="paginator__item"><a href="#">3</a></li>
+					<li class="paginator__item"><a href="#">4</a></li>
+					<li class="paginator__item paginator__item--next">
+						<a href="#"><i class="icon ion-ios-arrow-forward"></i></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.card__buttons {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 6px;
+		padding: 8px;
+		background: rgba(255, 255, 255, 0.05);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.btn-status {
+		flex: 1;
+		font-size: 11px;
+		padding: 4px 0;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		color: #fff;
+		background-color: #796878;
+		transition: all 0.3s ease;
+		white-space: nowrap;
+	}
+
+		.btn-status:hover {
+			opacity: 0.85;
+			transform: scale(1.03);
+		}
+
+		/* aktif renk durumları */
+		.btn-status.active.watched {
+			background-color: #28a745 !important;
+		}
+
+		.btn-status.active.watching {
+			background-color: #ffc107 !important;
+		}
+
+		.btn-status.active.willwatch {
+			background-color: #007bff !important;
+		}
+
+		/* login olmayan için gri pasif görünüm */
+		.btn-status.disabled {
+			background-color: #555 !important;
+			cursor: not-allowed !important;
+			opacity: 0.5 !important;
+		}
+</style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const isAuthenticated = @((User.Identity.IsAuthenticated).ToString().ToLower()); // true/false değeri döner
+
+		if (!isAuthenticated) return; // kullanıcı login değilse JS olayı eklenmesin
+
+		const cards = document.querySelectorAll(".card");
+
+		cards.forEach(card => {
+			const buttons = card.querySelectorAll(".btn-status");
+
+			buttons.forEach(btn => {
+				btn.addEventListener("click", function () {
+					buttons.forEach(b => {
+						if (b !== this) b.classList.remove("active");
+					});
+					this.classList.toggle("active");
+				});
+			});
+		});
+	});
+</script>

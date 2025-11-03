@@ -1,0 +1,164 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Izle.EntityLayer.Concrete
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600%7CUbuntu:300,400,500,700" rel="stylesheet">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="~/web/css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" href="~/web/css/bootstrap-grid.min.css">
+	<link rel="stylesheet" href="~/web/css/owl.carousel.min.css">
+	<link rel="stylesheet" href="~/web/css/jquery.mCustomScrollbar.min.css">
+	<link rel="stylesheet" href="~/web/css/nouislider.min.css">
+	<link rel="stylesheet" href="~/web/css/ionicons.min.css">
+	<link rel="stylesheet" href="~/web/css/plyr.css">
+	<link rel="stylesheet" href="~/web/css/photoswipe.css">
+	<link rel="stylesheet" href="~/web/css/default-skin.css">
+	<link rel="stylesheet" href="~/web/css/main.css">
+
+	<title>İzle Sohbet Et</title>
+</head>
+
+<body class="body">
+
+	<!-- header -->
+	<header class="header">
+		<div class="header__wrap">
+			<div class="container">
+				<div class="row">
+					<div class="col-12">
+						<div class="header__content">
+							<!-- header logo -->
+							<a href="~/Movie/Index" class="header__logo">
+								<img src="~/web/img/logo.svg" alt="">
+							</a>
+							<!-- end header logo -->
+
+							<!-- header nav -->
+							<ul class="header__nav">
+								<li class="header__nav-item">
+									<a class="header__nav-link" href="#">FİLMLER</a>
+								</li>
+								<li class="header__nav-item">
+									<a class="header__nav-link" href="#">DİZİLER</a>
+								</li>
+								<li class="header__nav-item">
+									<a href="#" class="header__nav-link">İZLEDİKLERİM</a>
+								</li>
+								<li class="header__nav-item">
+									<a href="#" class="header__nav-link">İZLEYECEKLERİM</a>
+								</li>
+								<li class="header__nav-item">
+									<a href="#" class="header__nav-link">İZLİYORUM</a>
+								</li>
+
+								@if (SignInManager.IsSignedIn(User))
+								{
+									<li class="header__nav-item">
+										<form asp-controller="Login" asp-action="LogOut" method="post" class="d-inline">
+											@Html.AntiForgeryToken()
+											<button type="submit" class="header__nav-link btn btn-link p-0 text-danger" style="border:none; background:none;">
+												ÇIKIŞ
+											</button>
+										</form>
+									</li>
+								}
+							</ul>
+							<!-- end header nav -->
+
+							<!-- header auth -->
+							<div class="header__auth">
+								<button class="header__search-btn" type="button">
+									<i class="icon ion-ios-search"></i>
+								</button>
+
+								@if (SignInManager.IsSignedIn(User))
+								{
+									<span class="header__user" style="color: #fff;">
+										Hoşgeldin, <strong style="color:#fff;">@UserManager.GetUserName(User)</strong>
+									</span>
+								}
+								else
+								{
+									<a href="/Login/Index/" class="header__sign-in">
+										<i class="icon ion-ios-log-in"></i>
+										<span>GİRİŞ YAP</span>
+									</a>
+								}
+							</div>
+							<!-- end header auth -->
+
+							<!-- header menu btn -->
+							<button class="header__btn" type="button">
+								<span></span>
+								<span></span>
+								<span></span>
+							</button>
+							<!-- end header menu btn -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- header search -->
+		<form action="#" class="header__search">
+			<div class="container">
+				<div class="row">
+					<div class="col-12">
+						<div class="header__search-content">
+							<input type="text" placeholder="Film dizi ara">
+							<button type="button">ARA</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+		<!-- end header search -->
+	</header>
+	<!-- end header -->
+
+	<section class="home">
+		<section class="content">
+			@RenderBody()
+		</section>
+	</section>
+
+	<!-- footer -->
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<!-- footer content burada aynı kalabilir -->
+			</div>
+		</div>
+	</footer>
+
+	<!-- JS -->
+	<script src="~/web/js/jquery-3.3.1.min.js"></script>
+	<script src="~/web/js/bootstrap.bundle.min.js"></script>
+	<script src="~/web/js/owl.carousel.min.js"></script>
+	<script src="~/web/js/jquery.mousewheel.min.js"></script>
+	<script src="~/web/js/jquery.mCustomScrollbar.min.js"></script>
+	<script src="~/web/js/wNumb.js"></script>
+	<script src="~/web/js/nouislider.min.js"></script>
+	<script src="~/web/js/plyr.min.js"></script>
+	<script src="~/web/js/jquery.morelines.min.js"></script>
+	<script src="~/web/js/photoswipe.min.js"></script>
+	<script src="~/web/js/photoswipe-ui-default.min.js"></script>
+	<script src="~/web/js/main.js"></script>
+</body>
+
+</html>
