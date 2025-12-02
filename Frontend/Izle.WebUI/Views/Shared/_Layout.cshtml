@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Izle.EntityLayer.Concrete
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,16 +24,63 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="filmsDropdown" role="button" data-bs-toggle="dropdown">
+                                FİLMLER
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>  <a class="nav-link text-dark" asp-area="Index" asp-controller="Movie" asp-action="Index">FİLM LİSTESİ</a></li>
+                                <li>  <a class="nav-link text-dark" asp-area="Watched" asp-controller="UserMovie" asp-action="Watched">İZLEDİKLERİM</a></li>
+                                <li>  <a class="nav-link text-dark" asp-area="WatchLater" asp-controller="UserMovie" asp-action="WatchLater">İZLEYECEKLERİM</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                        <!-- DİZİLER -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="seriesDropdown" role="button" data-bs-toggle="dropdown">
+                                DİZİLER
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="" asp-action="">İZLEDİKLERİM</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="" asp-action="">İZLİYORUM</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="" asp-action="">İZLEYECEKLERİM</a></li>
+                            </ul>
                         </li>
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="header__nav-item">
+                                <form asp-controller="Login" asp-action="LogOut" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="header__nav-link btn btn-link p-0 text-danger" style="border:none; background:none;">
+                                        ÇIKIŞ
+                                    </button>
+                                </form>
+                            </li>
+                        }
                     </ul>
+
+                    <div class="header__auth">
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <span class="header__user" style="color: #fff;">
+                                Hoşgeldin, <strong style="color:#fff;">@UserManager.GetUserName(User)</strong>
+                            </span>
+                        }
+                        else
+                        {
+                            <a href="/Login/Index/" class="header__sign-in">
+                                <i class="icon ion-ios-log-in"></i>
+                                <span>GİRİŞ YAP</span>
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">

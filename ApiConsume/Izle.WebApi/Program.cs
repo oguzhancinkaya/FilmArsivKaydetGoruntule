@@ -25,6 +25,9 @@ builder.Services.AddScoped<IMovieService, MovieManager>();
 builder.Services.AddScoped<IAccountDal, EfAccountDal>();
 builder.Services.AddScoped<IAccountService, AccountManager>();
 
+builder.Services.AddScoped<IUserMovieDal, EfUserMovieDal>();
+builder.Services.AddScoped<IUserMovieService, UserMovieManager>();
+
 builder.Services.AddHttpClient<TmdbApiService>();
 
 

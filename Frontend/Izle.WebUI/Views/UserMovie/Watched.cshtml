@@ -1,0 +1,73 @@
+﻿@* Views/UserMovie/Watched.cshtml *@
+@model List<Izle.WebUI.Models.UserMovie.UserMovie>
+
+<div class="container mt-4">
+    <h2>İzlediğim Filmler</h2>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <img src="@item.Movie.CoverImageUrl" class="card-img-top" alt="@item.Movie.Title" style="height: 400px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Movie.Title</h5>
+                            <p class="card-text">
+                                <small class="text-muted">Eklenme: @item.AddedDate.ToString("dd.MM.yyyy")</small>
+                            </p>
+                            <a href="/Movie/MovieDetail/@item.MovieId" class="btn btn-primary btn-sm">Detay</a>
+                            <button class="btn btn-danger btn-sm remove-movie" data-movie-id="@item.MovieId">
+                                Kaldır
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Henüz izlediğiniz bir film yok.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $('.remove-movie').click(function () {
+            const movieId = $(this).data('movie-id');
+            const card = $(this).closest('.col-md-3');
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu filmi listenizden kaldırmak istediğinize emin misiniz?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, kaldır',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/UserMovie/Remove',
+                        type: 'POST',
+                        data: { movieId: movieId },
+                        success: function (response) {
+                            if (response.success) {
+                                card.fadeOut(300, function () {
+                                    $(this).remove();
+                                });
+                                Swal.fire('Kaldırıldı!', 'Film listenizden kaldırıldı.', 'success');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

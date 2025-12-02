@@ -1,146 +1,211 @@
-﻿@model List<Movie>
+﻿@* Views/Movie/Index.cshtml *@
+@model List<Izle.WebUI.Models.Movie.Movie>
+
 @{
-	ViewData["Title"] = "Index";
-	Layout = "~/Views/HFLayout/_HFLayout.cshtml";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalMovies = ViewBag.TotalMovies ?? 0;
 }
 
-<div class="container">
-	<div class="row">
-		<div class="col-12">
-			<div class="section__wrap">
-				<h2 class="section__title">FİLMLER</h2>
-			</div>
-		</div>
-	</div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Filmler</h2>
+        <span class="badge bg-secondary">Toplam @totalMovies film</span>
+    </div>
+
+    <div class="row">
+        @foreach (var movie in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <img src="@movie.CoverImageUrl" class="card-img-top" alt="@movie.Title" style="height: 400px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@movie.Title</h5>
+                        <p class="card-text">
+                            <small class="text-muted">@movie.Category</small><br />
+                            <span class="badge bg-warning">⭐ @movie.Rating</span>
+                        </p>
+                        <a href="/Movie/MovieDetail/@movie.MovieId" class="btn btn-primary btn-sm">Detay</a>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <hr />
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success btn-sm movie-status-btn"
+                                        data-movie-id="@movie.MovieId"
+                                        data-status="Watched">
+                                    ✓ İzledim
+                                </button>
+                                <button class="btn btn-primary btn-sm movie-status-btn"
+                                        data-movie-id="@movie.MovieId"
+                                        data-status="Watching">
+                                    ▶ İzliyorum
+                                </button>
+                                <button class="btn btn-warning btn-sm movie-status-btn"
+                                        data-movie-id="@movie.MovieId"
+                                        data-status="WatchLater">
+                                    🕐 Sonra İzle
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Movie pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@(currentPage == 1 ? "#" : $"/Movie/Index?page={currentPage - 1}")" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- First Page -->
+                @if (currentPage > 3)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="/Movie/Index?page=1">1</a>
+                    </li>
+                    @if (currentPage > 4)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                <!-- Page Numbers -->
+                @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="/Movie/Index?page=@i">@i</a>
+                    </li>
+                }
+
+                <!-- Last Page -->
+                @if (currentPage < totalPages - 2)
+                {
+                    @if (currentPage < totalPages - 3)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                    <li class="page-item">
+                        <a class="page-link" href="/Movie/Index?page=@totalPages">@totalPages</a>
+                    </li>
+                }
+
+                <!-- Next Button -->
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@(currentPage == totalPages ? "#" : $"/Movie/Index?page={currentPage + 1}")" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
 
-<div class="catalog">
-	<div class="container">
-		<div class="row">
-			@foreach (var item in Model)
-			{
-				<div class="col-6 col-sm-4 col-lg-3 col-xl-2">
-					<div class="card">
-						<div class="card__cover">
-							<img src="@item.CoverImageUrl" alt="">
-							<a href="@Url.Action("MovieDetail", "Movie", new { id = item.MovieId })" class="card__play">
-								<i class="icon ion-ios-eye"></i>
-							</a>
-						</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            // Load movie statuses on page load
+        @if (User.Identity.IsAuthenticated)
+        {
+            <text>
+                    loadMovieStatuses();
+            </text>
+        }
 
-						<div class="card__content">
-							<h3 class="card__title"><a href="#">@item.Title</a></h3>
-							<span class="card__category">
-								<a href="#">@item.Category</a>
-							</span>
-							<span class="card__rate"><i class="icon ion-ios-star"></i>@item.Rating</span>
-						</div>
+                $('.movie-status-btn').click(function () {
+                    const movieId = $(this).data('movie-id');
+                    const status = $(this).data('status');
+                    const button = $(this);
 
-						<div class="card__buttons">
-							@if (User.Identity.IsAuthenticated)
-							{
-								<button class="btn-status watched">İzledim</button>
-								<button class="btn-status watching">İzliyorum</button>
-								<button class="btn-status willwatch">İzleyeceğim</button>
-							}
-							else
-							{
-								<button class="btn-status disabled" disabled>İzledim</button>
-								<button class="btn-status disabled" disabled>İzliyorum</button>
-								<button class="btn-status disabled" disabled>İzleyeceğim</button>
-							}
-						</div>
-					</div>
-				</div>
-			}
+                    $.ajax({
+                        url: '/UserMovie/UpdateStatus',
+                        type: 'POST',
+                        data: { movieId: movieId, status: status },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Başarılı!',
+                                    text: 'Film listenize eklendi',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
 
-			<div class="col-12">
-				<ul class="paginator">
-					<li class="paginator__item paginator__item--prev">
-						<a href="#"><i class="icon ion-ios-arrow-back"></i></a>
-					</li>
-					<li class="paginator__item paginator__item--active"><a href="#">1</a></li>
-					<li class="paginator__item"><a href="#">2</a></li>
-					<li class="paginator__item"><a href="#">3</a></li>
-					<li class="paginator__item"><a href="#">4</a></li>
-					<li class="paginator__item paginator__item--next">
-						<a href="#"><i class="icon ion-ios-arrow-forward"></i></a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-</div>
+                                // Tüm butonları normal yap
+                                button.closest('.d-grid').find('button').removeClass('active');
+                                // Tıklanan butonu aktif yap
+                                button.addClass('active');
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: 'İşlem başarısız oldu'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: 'Bir hata oluştu'
+                            });
+                        }
+                    });
+                });
 
-<style>
-	.card__buttons {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 6px;
-		padding: 8px;
-		background: rgba(255, 255, 255, 0.05);
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-	}
+            function loadMovieStatuses() {
+                $('.card').each(function () {
+                    const card = $(this);
+                    const movieId = card.find('.movie-status-btn').first().data('movie-id');
 
-	.btn-status {
-		flex: 1;
-		font-size: 11px;
-		padding: 4px 0;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		color: #fff;
-		background-color: #796878;
-		transition: all 0.3s ease;
-		white-space: nowrap;
-	}
+                    if (movieId) {
+                        $.ajax({
+                            url: '/UserMovie/GetStatus',
+                            type: 'GET',
+                            data: { movieId: movieId },
+                            success: function (response) {
+                                if (response.status) {
+                                    card.find('.movie-status-btn[data-status="' + response.status + '"]').addClass('active');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 
-		.btn-status:hover {
-			opacity: 0.85;
-			transform: scale(1.03);
-		}
+    <style>
+        .movie-status-btn.active {
+            opacity: 1;
+            font-weight: bold;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+        }
 
-		/* aktif renk durumları */
-		.btn-status.active.watched {
-			background-color: #28a745 !important;
-		}
+        .pagination .page-link {
+            color: #007bff;
+        }
 
-		.btn-status.active.watching {
-			background-color: #ffc107 !important;
-		}
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
 
-		.btn-status.active.willwatch {
-			background-color: #007bff !important;
-		}
-
-		/* login olmayan için gri pasif görünüm */
-		.btn-status.disabled {
-			background-color: #555 !important;
-			cursor: not-allowed !important;
-			opacity: 0.5 !important;
-		}
-</style>
-
-<script>
-	document.addEventListener("DOMContentLoaded", function () {
-		const isAuthenticated = @((User.Identity.IsAuthenticated).ToString().ToLower()); // true/false değeri döner
-
-		if (!isAuthenticated) return; // kullanıcı login değilse JS olayı eklenmesin
-
-		const cards = document.querySelectorAll(".card");
-
-		cards.forEach(card => {
-			const buttons = card.querySelectorAll(".btn-status");
-
-			buttons.forEach(btn => {
-				btn.addEventListener("click", function () {
-					buttons.forEach(b => {
-						if (b !== this) b.classList.remove("active");
-					});
-					this.classList.toggle("active");
-				});
-			});
-		});
-	});
-</script>
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+    </style>
+}
